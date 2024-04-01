@@ -1,4 +1,4 @@
-module FinalLevel2 (
+module Level2 (
    // VGA-related signals
 pixel_clk,
    col,
@@ -8,6 +8,7 @@ pixel_clk,
    blue,
    // input push buttons and switches
    resetSwitch,
+	switches
    );
 
 input [9:0]  col;
@@ -15,12 +16,13 @@ input [8:0]  row;
 
 input  resetSwitch,pixel_clk ;
   
-
+input [3:0] switches;
 
 output logic [3:0]  red;    // 4-bit color output
 output logic [3:0]  green;  // 4-bit color output
 output logic [3:0]  blue;   // 4-bit color output
 logic clk;
+logic withinAnyRectangle;
 
 FastClock(pixel_clk,clk);
 // Internal signals for rectangle properties
@@ -93,19 +95,31 @@ logic [9:0] rect_height11 = 425;
 
 //Finish_Rectangle
 logic [9:0] rect_x12 = 590;
-logic [8:0] rect_y12 = 460;
+logic [8:0] rect_y12 = 430;
 logic [9:0] rect_width12 = 50;
-logic [9:0] rect_height12 = 20;
+logic [9:0] rect_height12 = 50;
 
 //Start_Rectangle
 logic [9:0] rect_x13 = 20;
-logic [8:0] rect_y13 = 460;
+logic [8:0] rect_y13 = 430;
 logic [9:0] rect_width13 = 50;
-logic [9:0] rect_height13 = 20;
+logic [9:0] rect_height13 = 50;
+
+//Player
+logic [9:0] playerX = 33;
+logic [9:0] playery = 443;
+logic [9:0] playerWidth = 25;
+logic [9:0] playerHeight = 25;
 
 
 always_ff begin
-		if (col >= rect_x13 && col < rect_x13 + rect_width13 && row >= rect_y13 && row < rect_y13 + rect_height13)
+		if (col >= playerX && col < playerX + playerWidth && row >= playery && row < playery + playerHeight)
+			begin 
+				red <= 4'hF; 
+				blue <= 4'hF;
+				green <= 0;
+			end 
+		else if (col >= rect_x13 && col < rect_x13 + rect_width13 && row >= rect_y13 && row < rect_y13 + rect_height13)
 			begin 
 				red <= 0; 
 				blue <= 0;
@@ -220,6 +234,55 @@ always_ff begin
 
 
 end
+
+always_ff begin
+    if ((playerX > rect_x1 && playerX  + playerWidth < rect_x1 + rect_width1 && playery > rect_y1 && playery + playerHeight< rect_y1 + rect_height1) ||
+        (playerX + playerWidth > rect_x2 && playerX < rect_x2 + rect_width2 && playery + playerHeight > rect_y2 && playery < rect_y2 + rect_height2) ||
+        (playerX + playerWidth > rect_x3 && playerX < rect_x3 + rect_width3 && playery + playerHeight > rect_y3 && playery < rect_y3 + rect_height3) ||
+        (playerX + playerWidth > rect_x4 && playerX < rect_x4 + rect_width4 && playery + playerHeight > rect_y4 && playery < rect_y4 + rect_height4) ||
+        (playerX + playerWidth > rect_x5 && playerX < rect_x5 + rect_width5 && playery + playerHeight > rect_y5 && playery < rect_y5 + rect_height5) ||
+        (playerX + playerWidth > rect_x6 && playerX < rect_x6 + rect_width6 && playery + playerHeight > rect_y6 && playery < rect_y6 + rect_height6) ||
+        (playerX + playerWidth > rect_x7 && playerX < rect_x7 + rect_width7 && playery + playerHeight > rect_y7 && playery < rect_y7 + rect_height7) ||
+        (playerX + playerWidth > rect_x8 && playerX < rect_x8 + rect_width8 && playery + playerHeight > rect_y8 && playery < rect_y8 + rect_height8) ||
+        (playerX + playerWidth > rect_x9 && playerX < rect_x9 + rect_width9 && playery + playerHeight > rect_y9 && playery < rect_y9 + rect_height9) ||
+        (playerX + playerWidth > rect_x10 && playerX < rect_x10 + rect_width10 && playery + playerHeight > rect_y10 && playery < rect_y10 + rect_height10) ||
+        (playerX > rect_x11 && playerX + playerWidth< rect_x11 + rect_width11 && playery > rect_y11 && playery + playerHeight< rect_y11 + rect_height11))
+   
+
+    begin
+        withinAnyRectangle = 1; // Player is within at least one rectangle
+    end
+	 else withinAnyRectangle = 0;
+	 
+	 
+end
+always @(posedge clk) begin
+
+	 
+	 if(!withinAnyRectangle)begin
+		playerX <= 33;
+		playery <= 443;
+		end
+
+		  
+	  //move left
+	  if (switches[3] == 1 && withinAnyRectangle) begin
+			playerX <= playerX - 5;
+	  end
+	  //move up
+	  else if (switches[2] == 1 && withinAnyRectangle ) begin
+			playery <= playery - 5;
+	  end
+	  //move down
+	  else if (switches[1] == 1 && withinAnyRectangle ) begin
+			playery <= playery + 5;
+	  end
+	  //move right
+	  else if (switches[0] == 1 && withinAnyRectangle) begin
+			playerX <= playerX + 5;
+	  end
+	end
+	  
 
           
 
