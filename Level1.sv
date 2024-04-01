@@ -1,4 +1,4 @@
-module FinalLevel1 (
+module FinalLevel1SV (
    // VGA-related signals
 pixel_clk,
    col,
@@ -8,11 +8,14 @@ pixel_clk,
    blue,
    // input push buttons and switches
    resetSwitch,
+	switches
 
    );
 
 input [9:0]  col;
 input [8:0]  row;
+
+input [3:0] switches;
 
 input  resetSwitch,pixel_clk ;
     
@@ -68,13 +71,25 @@ logic [8:0] rect_y7 = 0;
 logic [9:0] rect_width7 = 140;
 logic [9:0] rect_height7 = 50;
 
+//Player
+logic [9:0] playerX = 113;
+logic [9:0] playery = 443;
+logic [9:0] playerWidth = 25;
+logic [9:0] playerHeight = 25;
 
 
-	
+
 always_ff begin
+		if (col >= playerX && col < playerX + playerWidth && row >= playery && row < playery + playerHeight)
+			begin 
+				red <= 4'hF; 
+				blue <= 4'hF;
+				green <= 0;
+			end 
+
 
 		//start rectangle
-		if (col >= rect_x6 && col < rect_x6 + rect_width1 && row >= rect_y6 && row < rect_y6 + rect_height6)
+		else if (col >= rect_x6 && col < rect_x6 + rect_width1 && row >= rect_y6 && row < rect_y6 + rect_height6)
 			begin 
 				red <= 0; 
 				blue <= 0;
@@ -143,6 +158,40 @@ always_ff begin
 			blue <= 0;
 			green <= 0;
 		end
+		
+		
+		
+end
+//logic [9:0] rect_x1 = 100;
+//logic [8:0] rect_y1 = 100;
+//logic [9:0] rect_width1 = 50;
+//logic [9:0] rect_height1 = 380;
+always @(posedge clk) begin
+	if(playerX < 100 || playerX + playerWidth > 150)begin
+		playerX <= 113;
+		playery <= 443;
+	end
+	
+		  
+	  //move left
+	  if (switches[3] == 1) begin
+			playerX <= playerX - 5;
+	  end
+	  //move up
+	  else if (switches[2] == 1  ) begin
+			playery <= playery - 5;
+	  end
+	  //move down
+	  else if (switches[1] == 1  ) begin
+			playery <= playery + 5;
+	  end
+	  //move right
+	  else if (switches[0] == 1 ) begin
+			playerX <= playerX + 5;
+	  end
+	  
+	  
+
 end
 
           
