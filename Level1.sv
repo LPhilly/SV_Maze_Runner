@@ -1,4 +1,4 @@
-module FinalLevel1SV (
+module Level1 (
    // VGA-related signals
 pixel_clk,
    col,
@@ -25,9 +25,10 @@ output logic [3:0]  red;    // 4-bit color output
 output logic [3:0]  green;  // 4-bit color output
 output logic [3:0]  blue;   // 4-bit color output
 logic clk;
+logic withinAnyRectangle;
 
 FastClock(pixel_clk,clk);
-// Internal signals for rectangle properties
+
 
 //Rectangle 1
 logic [9:0] rect_x1 = 100;
@@ -162,31 +163,43 @@ always_ff begin
 		
 		
 end
-//logic [9:0] rect_x1 = 100;
-//logic [8:0] rect_y1 = 100;
-//logic [9:0] rect_width1 = 50;
-//logic [9:0] rect_height1 = 380;
+
+always_ff begin
+if ((playerX  > rect_x1 && playerX + playerWidth< rect_x1 + rect_width1 && playery  > rect_y1 && playery + playerHeight < rect_y1 + rect_height1) ||
+        (playerX + playerWidth > rect_x2 && playerX < rect_x2 + rect_width2 && playery > rect_y2 && playery + playerHeight< rect_y2 + rect_height2) ||
+        (playerX + playerWidth > rect_x3 && playerX < rect_x3 + rect_width3 && playery + playerHeight > rect_y3 && playery < rect_y3 + rect_height3) ||
+        (playerX + playerWidth > rect_x4 && playerX < rect_x4 + rect_width4 && playery + playerHeight > rect_y4 && playery < rect_y4 + rect_height4) ||
+        (playerX + playerWidth > rect_x5 && playerX < rect_x5 + rect_width5 && playery + playerHeight > rect_y5 && playery < rect_y5 + rect_height5)) 
+    begin
+        withinAnyRectangle = 1; 
+    end
+	 else withinAnyRectangle = 0;
+	 
+	 
+end
 always @(posedge clk) begin
-	if(playerX < 100 || playerX + playerWidth > 150)begin
+
+	 
+	 if(!withinAnyRectangle)begin
 		playerX <= 113;
 		playery <= 443;
-	end
-	
+		end
+
 		  
 	  //move left
-	  if (switches[3] == 1) begin
+	  if (switches[3] == 1 && withinAnyRectangle) begin
 			playerX <= playerX - 5;
 	  end
 	  //move up
-	  else if (switches[2] == 1  ) begin
+	  else if (switches[2] == 1 && withinAnyRectangle ) begin
 			playery <= playery - 5;
 	  end
 	  //move down
-	  else if (switches[1] == 1  ) begin
+	  else if (switches[1] == 1 && withinAnyRectangle ) begin
 			playery <= playery + 5;
 	  end
 	  //move right
-	  else if (switches[0] == 1 ) begin
+	  else if (switches[0] == 1 && withinAnyRectangle) begin
 			playerX <= playerX + 5;
 	  end
 	  
