@@ -20,12 +20,14 @@ logic ACCELEROMETER = 1;  // REPLACE THIS WITH THE ACTUAL ACCELEROMETER INPUT
 logic clk;
 logic [1:0] level;
 logic [1:0] next_level;
-logic withinAnyRectangle;
+logic withinAnyRectangle1;
+logic withinAnyRectangle3;
+logic withinAnyRectangle2;
 	
 typedef enum logic [1:0] {init, level_selection, gameplay} state; 
 state current_state, next_state;
 
-typedef enum logic [1:0] {game_init, move, still, finish} gameplay_state; 
+typedef enum logic [1:0] {game_init, move, finish} gameplay_state; 
 gameplay_state current_gameplay, next_gameplay; 
 
 
@@ -220,20 +222,16 @@ always_ff @ (posedge clk) begin
 	level <= next_level;
 end 
 
-always_comb 
+always_ff
 	case (current_state)
 		init: begin
 					next_level <= level;
 					red <= 4'h0;
 					green <= 4'h0;
 					blue <= 4'h0;
-					playerX3 <= 13;
-					playery3 <= 230;
-					playerX2 <= 33;
-					playery2 <= 443;
-					playerX1 <= 113;
-					playery1 <= 443;
-					withinAnyRectangle <= 0;
+					withinAnyRectangle1 <= 1;
+					withinAnyRectangle2 <= 1;
+					withinAnyRectangle3 <= 1;
 					if (level_select != 2'b00) begin
 						next_state <= level_selection;
 					end
@@ -242,13 +240,9 @@ always_comb
 				next_gameplay <= current_gameplay;
 				end
 		level_selection: begin
-								playerX3 <= 13;
-								playery3 <= 230;
-								playerX2 <= 33;
-								playery2 <= 443;
-								playerX1 <= 113;
-								playery1 <= 443;
-								withinAnyRectangle <= 0;
+								withinAnyRectangle1 <= 1;
+								withinAnyRectangle2 <= 1;
+								withinAnyRectangle3 <= 1;
 									case (level_select) 
 										2'b00: 	begin
 													red <= 0;
@@ -536,7 +530,7 @@ always_comb
 		gameplay: begin
 					next_level <= level;
 		
-					case (level_select) 
+					case (level) 
 										2'b00: 	begin
 													red <= 0;
 														blue <= 0;
@@ -732,10 +726,6 @@ always_comb
 														blue <= 4'hF;
 														green <= 4'hF;
 													end  
-
-												
-
-													
 											 
 													else begin
 														red <= 0; 
@@ -811,13 +801,9 @@ always_comb
 					
 						case (current_gameplay)
 						game_init : begin
-								playerX3 <= 13;
-								playery3 <= 230;
-								playerX2 <= 33;
-								playery2 <= 443;
-								playerX1 <= 113;
-								playery1 <= 443;
-								withinAnyRectangle <= 0;
+								withinAnyRectangle1 <= 1;
+					withinAnyRectangle2 <= 1;
+					withinAnyRectangle3 <= 1;
 										
 											if (ACCELEROMETER) 
 												next_gameplay <= move; 
@@ -832,10 +818,10 @@ always_comb
 							    (playerX1 + playerWidth1 > rect_x41 && playerX1 < rect_x41 + rect_width41 && playery1 + playerHeight1 > rect_y41 && playery1 < rect_y41 + rect_height41) ||
 							    (playerX1 + playerWidth1 > rect_x51 && playerX1 < rect_x51 + rect_width51 && playery1 + playerHeight1 > rect_y51 && playery1 < rect_y51 + rect_height51)) 
 						    begin
-						        withinAnyRectangle <= 1; 
+						        withinAnyRectangle1 <= 1; 
 						    end
 							 else 
-								 withinAnyRectangle <= 0;
+								 withinAnyRectangle1 <= 0;
 
 							if ((playerX2 > rect_x12 && playerX2  + playerWidth2 < rect_x12 + rect_width12 && playery2 > rect_y12 && playery2 + playerHeight2< rect_y12 + rect_height12) ||
 							    (playerX2 + playerWidth2 > rect_x22 && playerX2 < rect_x22 + rect_width22 && playery2 + playerHeight2 > rect_y22 && playery2 < rect_y22 + rect_height22) ||
@@ -851,98 +837,18 @@ always_comb
 							   
 							
 							    begin
-							        withinAnyRectangle <= 1; // Player is within at least one rectangle
+							        withinAnyRectangle2 <= 1; // Player is within at least one rectangle
 							    end
-								 else withinAnyRectangle <= 0;
+								 else withinAnyRectangle2 <= 0;
 
 							if ((playerX3  > rect_x13 && playerX3 + playerWidth3< rect_x13 + rect_width13 && playery3  > rect_y13 && playery3 + playerHeight3 < rect_y13 + rect_height13) ||
 							    (playerX3 + playerWidth3 > rect_x23 && playerX3 < rect_x23 + rect_width23 && playery3 > rect_y23 && playery3 + playerHeight3< rect_y23 + rect_height23) ||
 							    (playerX3 + playerWidth3 > rect_x33 && playerX3 < rect_x33 + rect_width33 && playery3 > rect_y33 && playery3 + playerHeight3 < rect_y33 + rect_height33) ||
 							    (playerX3 + playerWidth3 > rect_x43 && playerX3 < rect_x43 + rect_width43 && playery3 > rect_y43 && playery3 + playerHeight3 < rect_y43 + rect_height43)) 
 						    begin
-						        withinAnyRectangle = 1; // Player is within at least one rectangle
+						        withinAnyRectangle3 <= 1; // Player is within at least one rectangle
 						    end
-							 else withinAnyRectangle <= 0;
-
-							case(level_selection) 
-
-							2'b00: withinAnyRectangle <= 0;
-
-							2'b01: begin
-
-								 if(!withinAnyRectangle)begin
-									playerX1 <= 113;
-									playery1 <= 443;
-									end
-							
-									  
-								  //move left
-								  if (switches[3] == 1 && withinAnyRectangle) begin
-										playerX1 <= playerX1 - 5;
-								  end
-								  //move up
-								  else if (switches[2] == 1 && withinAnyRectangle ) begin
-										playery1 <= playery1 - 5;
-								  end
-								  //move down
-								  else if (switches[1] == 1 && withinAnyRectangle ) begin
-										playery1 <= playery1 + 5;
-								  end
-								  //move right
-								  else if (switches[0] == 1 && withinAnyRectangle) begin
-										playerX1 <= playerX1 + 5;
-								  end
-							end
-
-								2'b10: begin
-									 if(!withinAnyRectangle)begin
-										playerX2 <= 33;
-										playery2 <= 443;
-										end
-								
-										  
-									  //move left
-									  if (switches[3] == 1 && withinAnyRectangle) begin
-											playerX2 <= playerX2 - 5;
-									  end
-									  //move up
-									  else if (switches[2] == 1 && withinAnyRectangle ) begin
-											playery2 <= playery2 - 5;
-									  end
-									  //move down
-									  else if (switches[1] == 1 && withinAnyRectangle ) begin
-											playery2 <= playery2 + 5;
-									  end
-									  //move right
-									  else if (switches[0] == 1 && withinAnyRectangle) begin
-											playerX2 <= playerX2 + 5;
-									  end
-								end
-
-								2'b11: begin 
-									 if(!withinAnyRectangle)begin
-										playerX3 <= 13;
-										playery3 <= 230;
-										end
-								
-									  //move left
-									  if (switches[3] == 1 && withinAnyRectangle) begin
-											playerX3 <= playerX - 5;
-									  end
-									  //move up
-									  else if (switches[2] == 1 && withinAnyRectangle ) begin
-											playery3 <= playery - 5;
-									  end
-									  //move down
-									  else if (switches[1] == 1 && withinAnyRectangle ) begin
-											playery3 <= playery + 5;
-									  end
-									  //move right
-									  else if (switches[0] == 1 && withinAnyRectangle) begin
-											playerX3 <= playerX + 5;
-									  end
-								end
-							endcase 
+							 else withinAnyRectangle3 <= 0;
 							 
 							
 							
@@ -958,13 +864,6 @@ always_comb
 								 
 								  
 						finish : begin
-								playerX3 <= 13;
-								playery3 <= 230;
-								playerX2 <= 33;
-								playery2 <= 443;
-								playerX1 <= 113;
-								playery1 <= 443;
-								withinAnyRectangle <= 0;
 								
 									
 									if (!KEY0)
@@ -985,4 +884,90 @@ always_comb
 							next_state <= level_selection;
 					 end
 	endcase
+	
+	always @ (posedge clk) begin
+		if (current_state == gameplay && current_gameplay == move) begin
+				case(level) 
+
+							2'b01: begin
+
+								 if(!withinAnyRectangle1)begin
+									playerX1 <= 113;
+									playery1 <= 443;
+									end
+							
+									  
+								  //move left
+								  if (switches[3] == 1 && withinAnyRectangle1) begin
+										playerX1 <= playerX1 - 5;
+								  end
+								  //move up
+								  else if (switches[2] == 1 && withinAnyRectangle1 ) begin
+										playery1 <= playery1 - 5;
+								  end
+								  //move down
+								  else if (switches[1] == 1 && withinAnyRectangle1 ) begin
+										playery1 <= playery1 + 5;
+								  end
+								  //move right
+								  else if (switches[0] == 1 && withinAnyRectangle1) begin
+										playerX1 <= playerX1 + 5;
+								  end
+							end
+
+								2'b10: begin
+									 if(!withinAnyRectangle2)begin
+										playerX2 <= 33;
+										playery2 <= 443;
+										end
+								
+										  
+									  //move left
+									  if (switches[3] == 1 && withinAnyRectangle2) begin
+											playerX2 <= playerX2 - 5;
+									  end
+									  //move up
+									  else if (switches[2] == 1 && withinAnyRectangle2 ) begin
+											playery2 <= playery2 - 5;
+									  end
+									  //move down
+									  else if (switches[1] == 1 && withinAnyRectangle2 ) begin
+											playery2 <= playery2 + 5;
+									  end
+									  //move right
+									  else if (switches[0] == 1 && withinAnyRectangle2) begin
+											playerX2 <= playerX2 + 5;
+									  end
+								end
+
+								2'b11: begin 
+									 if(!withinAnyRectangle3)begin
+										playerX3 <= 13;
+										playery3 <= 230;
+										end
+								 
+									  //move left
+									  if (switches[3] == 1 && withinAnyRectangle3) begin
+											playerX3 <= playerX3 - 5;
+									  end
+									  //move up
+									  else if (switches[2] == 1 && withinAnyRectangle3 ) begin
+											playery3 <= playery3 - 5;
+									  end
+									  //move down
+									  else if (switches[1] == 1 && withinAnyRectangle3 ) begin
+											playery3 <= playery3 + 5;
+									  end
+									  //move right
+									  else if (switches[0] == 1 && withinAnyRectangle3) begin
+											playerX3 <= playerX3 + 5;
+									  end
+								end
+							endcase 
+						end
+					else begin 
+					
+					end
+	end
+
 endmodule 
