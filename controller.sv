@@ -27,7 +27,7 @@ logic withinAnyRectangle2;
 typedef enum logic [1:0] {init, level_selection, gameplay} state; 
 state current_state, next_state;
 
-typedef enum logic [1:0] {game_init, move, finish} gameplay_state; 
+typedef enum logic [1:0] {game_init, move} gameplay_state; 
 gameplay_state current_gameplay, next_gameplay; 
 
 
@@ -805,7 +805,7 @@ always_ff
 					withinAnyRectangle2 <= 1;
 					withinAnyRectangle3 <= 1;
 										
-											if (ACCELEROMETER) 
+											if (switches != 4'b0000) 
 												next_gameplay <= move; 
 											else 
 												next_gameplay <= game_init;
@@ -851,32 +851,38 @@ always_ff
 							 else withinAnyRectangle3 <= 0;
 							 
 							
-							
-										if (0) // FINISH POSITION
-											next_gameplay <= finish; 
-										else if (1) // COLLISION 
-											next_gameplay <= game_init;
-										else if (0) 
-											next_gameplay <= move; 
+								case (level) 
+								2'b01: begin 
+										if(!withinAnyRectangle1) 
+											next_gameplay <= game_init; 
+										else 
+											next_gameplay <= move;
+								
+										end
+								2'b10: begin
+											if(!withinAnyRectangle2) 
+											next_gameplay <= game_init; 
+										else 
+											next_gameplay <= move;
+										end
+										
+								2'b11: begin
+									if(!withinAnyRectangle3) 
+											next_gameplay <= game_init; 
+										else 
+											next_gameplay <= move;
+										end
+								
+								
+								endcase
 												
 								
 								 end
 								 
-								  
-						finish : begin
-								
-									
-									if (!KEY0)
-										next_gameplay <= game_init; 
-									else 
-										next_gameplay <= finish; 
-									
-									end
 						endcase
 						
 						
-						
-						
+					
 						
 						if (level_lock) 
 							next_state <= gameplay; 
@@ -891,7 +897,7 @@ always_ff
 
 							2'b01: begin
 
-								 if(!withinAnyRectangle1)begin
+								 if(!withinAnyRectangle1 || ~KEY0)begin
 									playerX1 <= 113;
 									playery1 <= 443;
 									end
@@ -916,7 +922,7 @@ always_ff
 							end
 
 								2'b10: begin
-									 if(!withinAnyRectangle2)begin
+									 if(!withinAnyRectangle2 || ~KEY0)begin
 										playerX2 <= 33;
 										playery2 <= 443;
 										end
@@ -941,7 +947,7 @@ always_ff
 								end
 
 								2'b11: begin 
-									 if(!withinAnyRectangle3)begin
+									 if(!withinAnyRectangle3 || ~KEY0)begin
 										playerX3 <= 13;
 										playery3 <= 230;
 										end
