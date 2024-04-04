@@ -2,7 +2,7 @@ module controller (
 	
 input logic [1:0] level_select, 
 input logic level_lock, 
-input logic clk, 
+input logic pixel_clk, 
 input logic KEY0,
 input [9:0]  col,
 input [8:0]  row,
@@ -16,6 +16,9 @@ output logic [3:0] blue
 );
 
 logic ACCELEROMETER = 1;  // REPLACE THIS WITH THE ACTUAL ACCELEROMETER INPUT
+logic clk;
+logic [1:0] level;
+logic [1:0] next_level;
 
 typedef enum logic [1:0] {init, level_selection, gameplay} state; 
 state current_state, next_state;
@@ -212,12 +215,13 @@ logic [9:0] playerHeight3 = 25;
 always_ff @ (posedge clk) begin 
 	current_state <= next_state;
 	current_gameplay <= next_gameplay;
+	level <= next_level;
 end 
 
 always_comb 
 	case (current_state)
 		init: begin
-					
+					next_level <= level;
 					red <= 4'h0;
 					green <= 4'h0;
 					blue <= 4'h0;
@@ -230,6 +234,293 @@ always_comb
 				end
 		level_selection: begin
 									case (level_select) 
+										2'b00: 	begin
+													red <= 0;
+													blue <= 0;
+													green <= 0;
+													next_level <= 2'b00;
+												end
+										2'b01: begin
+													if (col >= playerX1 && col < playerX1 + playerWidth1 && row >= playery1 && row < playery1 + playerHeight1)
+														begin 
+															red <= 4'hF; 
+															blue <= 4'hF;
+															green <= 0;
+														end 
+
+
+													//start rectangle
+													else if (col >= rect_x61 && col < rect_x61 + rect_width11 && row >= rect_y61 && row < rect_y61 + rect_height61)
+														begin 
+															red <= 0; 
+															blue <= 0;
+															green <= 4'hF;
+														end 
+													//draw rectangle1
+													else if (col >= rect_x11 && col < rect_x11 + rect_width11 && row >= rect_y11 && row < rect_y11 + rect_height11)
+														begin 
+															red <= 4'hF; 
+															blue <= 4'hF;
+															green <= 4'hF;
+														end 
+													
+
+
+													//draw rectangle2
+												  else if (col >= rect_x21 && col < rect_x21 + rect_width21 && row >= rect_y21 && row < rect_y21 + rect_height21)
+														begin 
+															red <= 4'hF; 
+															blue <= 4'hF;
+															green <= 4'hF;
+														end 
+													
+
+
+
+													//draw rectangle3
+													else if (col >= rect_x31 && col < rect_x31 + rect_width31 && row >= rect_y31 && row < rect_y31 + rect_height31)
+														begin 
+															red <= 4'hF; 
+															blue <= 4'hF;
+															green <= 4'hF;
+														end 
+
+
+
+
+													//draw rectangl4
+													else if (col >= rect_x41 && col < rect_x41 + rect_width41 && row >= rect_y41 && row < rect_y41 + rect_height41)
+														begin 
+															red <= 4'hF; 
+															blue <= 4'hF;
+															green <= 4'hF;
+														end 
+														// end rectangle
+													else if (col >= rect_x71 && col < rect_x71 + rect_width71 && row >= rect_y71 && row < rect_y71 + rect_height71)
+														begin 
+															red <= 4'hF; 
+															blue <= 0;
+															green <= 0;
+														end 
+													
+
+
+
+													//draw rectangle5
+													else if (col >= rect_x51 && col < rect_x51 + rect_width51 && row >= rect_y51 && row < rect_y51 + rect_height51)
+														begin 
+															red <= 4'hF; 
+															blue <= 4'hF;
+															green <= 4'hF;
+														end 
+
+													else begin
+														red <= 0;
+														blue <= 0;
+														green <= 0;
+													end
+													next_level <= 2'b01;
+		
+												 end
+										2'b10: begin
+												if (col >= playerX2 && col < playerX2 + playerWidth2 && row >= playery2 && row < playery2 + playerHeight2)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 0;
+													end 
+												else if (col >= rect_x132 && col < rect_x132 + rect_width132 && row >= rect_y132 && row < rect_y132 + rect_height132)
+													begin 
+														red <= 0; 
+														blue <= 0;
+														green <= 4'hF;
+													end
+												//draw rectangle1
+												else if (col >= rect_x12 && col < rect_x12 + rect_width12 && row >= rect_y12 && row < rect_y12 + rect_height12)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+												
+												//draw rectangle2
+												else if (col >= rect_x22 && col < rect_x22 + rect_width22 && row >= rect_y22 && row < rect_y22 + rect_height22)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+
+												//draw rectangle3
+												else if (col >= rect_x32 && col < rect_x32 + rect_width32 && row >= rect_y32 && row < rect_y32 + rect_height32)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+
+												//draw rectangle4
+												else if (col >= rect_x42 && col < rect_x42 + rect_width42 && row >= rect_y42 && row < rect_y42 + rect_height42)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+
+
+												//draw rectangle5
+												else if (col >= rect_x52 && col < rect_x52 + rect_width52 && row >= rect_y52 && row < rect_y52 + rect_height52)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+												
+												//draw rectangle6
+												else if (col >= rect_x62 && col < rect_x62 + rect_width62 && row >= rect_y62 && row < rect_y62 + rect_height62)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+
+												//draw rectangle7
+												else if (col >= rect_x72 && col < rect_x72 + rect_width72 && row >= rect_y72 && row < rect_y72 + rect_height72)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+												
+												//draw rectangle8
+												else if (col >= rect_x82 && col < rect_x82 + rect_width82 && row >= rect_y82 && row < rect_y82 + rect_height82)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+
+													//draw rectangle9
+												else if (col >= rect_x92 && col < rect_x92 + rect_width92 && row >= rect_y92 && row < rect_y92 + rect_height92)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+
+													//draw rectangle10
+												else if (col >= rect_x102 && col < rect_x102 + rect_width102 && row >= rect_y102 && row < rect_y102 + rect_height102)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end
+													
+														//Finish_Rectangle
+											  else if (col >= rect_x122 && col < rect_x122 + rect_width122 && row >= rect_y122 && row < rect_y122 + rect_height122)
+													begin 
+														red <= 4'hF; 
+														blue <= 0;
+														green <= 0;
+													end
+
+													//draw rectangle11
+												else if (col >= rect_x112 && col < rect_x112 + rect_width112 && row >= rect_y112 && row < rect_y112 + rect_height112)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end  
+
+												
+
+													
+											 
+													else begin
+														red <= 0; 
+														blue <= 0;
+														green <= 0;
+													end
+												next_level <= 2'b10;
+												 end
+										2'b11: begin 
+												if (col >= playerX3 && col < playerX3 + playerWidth3 && row >= playery3 && row < playery3 + playerHeight3)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 0;
+													end 
+												
+												//Start Rectangle
+												else if (col >= rect_x63 && col < rect_x63 + rect_width63 && row >= rect_y63 && row < rect_y63 + rect_height63)
+													begin 
+														red <= 0; 
+														blue <= 0;
+														green <= 4'hF;
+													end 
+												//draw rectangle1
+												else if (col >= rect_x13 && col < rect_x13 + rect_width13 && row >= rect_y13 && row < rect_y13 + rect_height13)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+													
+												//draw rectangle2
+											  else if (col >= rect_x23 && col < rect_x23 + rect_width23 && row >= rect_y23 && row < rect_y23 + rect_height23)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+
+												//draw rectangle3
+												else if (col >= rect_x33 && col < rect_x33 + rect_width33 && row >= rect_y33 && row < rect_y33 + rect_height33)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+													//Finish Rectangle
+												else if (col >= rect_x53 && col < rect_x53 + rect_width53 && row >= rect_y53 && row < rect_y53 + rect_height53)
+													begin 
+														red <= 4'hF; 
+														blue <= 0;
+														green <= 0;
+													end 
+
+
+
+												//draw rectangl4
+												else if (col >= rect_x43 && col < rect_x43 + rect_width43 && row >= rect_y43 && row < rect_y43 + rect_height43)
+													begin 
+														red <= 4'hF; 
+														blue <= 4'hF;
+														green <= 4'hF;
+													end 
+												
+												
+
+												else begin
+													red <= 0;
+													blue <= 0;
+													green <= 0;
+												end
+											next_level <= 2'b11;
+												 end 
+									endcase
+									
+										if (!level_lock) begin
+											next_state <= level_selection;
+										end
+										else
+											next_state <= gameplay;
+									next_gameplay <= current_gameplay;
+							  end
+		gameplay: begin
+					next_level <= level;
+		
+					case (level_select) 
 										2'b00: 	begin
 													red <= 0;
 														blue <= 0;
@@ -501,20 +792,6 @@ always_comb
 												end
 												 end 
 									endcase
-									
-										if (!level_lock) begin
-											next_state <= level_selection;
-										end
-										else
-											next_state <= gameplay;
-									next_gameplay <= current_gameplay;
-							  end
-		gameplay: begin
-		
-					red <= 4'h0;
-					green <= 4'h0;
-					blue <= 4'h0;
-					// THE ABOVE IS FILLER UNTIL WE FIGURE MOVEMENT OUT
 					
 						case (current_gameplay)
 						game_init : begin
