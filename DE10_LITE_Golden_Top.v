@@ -141,7 +141,7 @@ vga_controller(pixel_clk,KEY[0],VGA_HS,VGA_VS, display_en, col, row);
 //lab5(MAX10_CLK2_50,col,row,red,green,blue,KEY[0], KEY[1],SW[3:0],SW[8],HEX2[6:0],HEX1[6:0]);
 //FinalLevel3(MAX10_CLK2_50,col,row,red,green,blue,KEY[0], KEY[1],SW[3:0],SW[8],HEX2[6:0],HEX1[6:0]);
 //FinalLevel2(MAX10_CLK2_50,col,row,red,green,blue,KEY[0], KEY[1],SW[3:0],SW[8],HEX2[6:0],HEX1[6:0]);
-	controller(SW[1:0], SW[9], pixel_clk, KEY[0], col, row, SW[5:2], red, green, blue);
+controller(SW[1:0], SW[9], MAX10_CLK2_50, KEY[0], col, row, SW[5:2], red, green, blue);
 always@(posedge pixel_clk)begin
 	if(display_en == 1'b1)begin
 		VGA_R <= red;
