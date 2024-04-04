@@ -6,6 +6,7 @@ input logic pixel_clk,
 input logic KEY0,
 input [9:0]  col,
 input [8:0]  row,
+input [3:0] switches, 
 
 
 
@@ -19,7 +20,8 @@ logic ACCELEROMETER = 1;  // REPLACE THIS WITH THE ACTUAL ACCELEROMETER INPUT
 logic clk;
 logic [1:0] level;
 logic [1:0] next_level;
-
+logic withinAnyRectangle;
+	
 typedef enum logic [1:0] {init, level_selection, gameplay} state; 
 state current_state, next_state;
 
@@ -225,6 +227,13 @@ always_comb
 					red <= 4'h0;
 					green <= 4'h0;
 					blue <= 4'h0;
+					playerX3 <= 13;
+					playery3 <= 230;
+					playerX2 <= 33;
+					playery2 <= 443;
+					playerX1 <= 113;
+					playery1 <= 443;
+					withinAnyRectangle <= 0;
 					if (level_select != 2'b00) begin
 						next_state <= level_selection;
 					end
@@ -233,6 +242,13 @@ always_comb
 				next_gameplay <= current_gameplay;
 				end
 		level_selection: begin
+								playerX3 <= 13;
+								playery3 <= 230;
+								playerX2 <= 33;
+								playery2 <= 443;
+								playerX1 <= 113;
+								playery1 <= 443;
+								withinAnyRectangle <= 0;
 									case (level_select) 
 										2'b00: 	begin
 													red <= 0;
@@ -795,6 +811,13 @@ always_comb
 					
 						case (current_gameplay)
 						game_init : begin
+								playerX3 <= 13;
+								playery3 <= 230;
+								playerX2 <= 33;
+								playery2 <= 443;
+								playerX1 <= 113;
+								playery1 <= 443;
+								withinAnyRectangle <= 0;
 										
 											if (ACCELEROMETER) 
 												next_gameplay <= move; 
@@ -802,33 +825,147 @@ always_comb
 												next_gameplay <= game_init;
 										end
 						move : begin
-										
-										if (1) // FINISH POSITION
+
+							if ((playerX1  > rect_x11 && playerX1 + playerWidth1< rect_x11 + rect_width11 && playery1  > rect_y11 && playery1 + playerHeight1 < rect_y11 + rect_height11) ||
+							    (playerX1 + playerWidth1 > rect_x21 && playerX1 < rect_x21 + rect_width21 && playery1 > rect_y21 && playery1 + playerHeight1< rect_y21 + rect_height21) ||
+							    (playerX1 + playerWidth1 > rect_x31 && playerX1 < rect_x31 + rect_width31 && playery1 + playerHeight1 > rect_y31 && playery1 < rect_y31 + rect_height31) ||
+							    (playerX1 + playerWidth1 > rect_x41 && playerX1 < rect_x41 + rect_width41 && playery1 + playerHeight1 > rect_y41 && playery1 < rect_y41 + rect_height41) ||
+							    (playerX1 + playerWidth1 > rect_x51 && playerX1 < rect_x51 + rect_width51 && playery1 + playerHeight1 > rect_y51 && playery1 < rect_y51 + rect_height51)) 
+						    begin
+						        withinAnyRectangle <= 1; 
+						    end
+							 else 
+								 withinAnyRectangle <= 0;
+
+							if ((playerX2 > rect_x12 && playerX2  + playerWidth2 < rect_x12 + rect_width12 && playery2 > rect_y12 && playery2 + playerHeight2< rect_y12 + rect_height12) ||
+							    (playerX2 + playerWidth2 > rect_x22 && playerX2 < rect_x22 + rect_width22 && playery2 + playerHeight2 > rect_y22 && playery2 < rect_y22 + rect_height22) ||
+							    (playerX2 + playerWidth2 > rect_x32 && playerX2 < rect_x32 + rect_width32 && playery2 + playerHeight2 > rect_y32 && playery2 < rect_y32 + rect_height32) ||
+							    (playerX2 + playerWidth2 > rect_x42 && playerX2 < rect_x42 + rect_width42 && playery2 + playerHeight2 > rect_y42 && playery2 < rect_y42 + rect_height42) ||
+							    (playerX2 + playerWidth2 > rect_x52 && playerX2 < rect_x52 + rect_width52 && playery2 + playerHeight2 > rect_y52 && playery2 < rect_y52 + rect_height52) ||
+							    (playerX2 + playerWidth2 > rect_x62 && playerX2 < rect_x62 + rect_width62 && playery2 + playerHeight2 > rect_y62 && playery2 < rect_y62 + rect_height62) ||
+							    (playerX2 + playerWidth2 > rect_x72 && playerX2 < rect_x72 + rect_width72 && playery2 + playerHeight2 > rect_y72 && playery2 < rect_y72 + rect_height72) ||
+							    (playerX2 + playerWidth2 > rect_x82 && playerX2 < rect_x82 + rect_width82 && playery2 + playerHeight2 > rect_y82 && playery2 < rect_y82 + rect_height82) ||
+							    (playerX2 + playerWidth2 > rect_x92 && playerX2 < rect_x92 + rect_width92 && playery2 + playerHeight2 > rect_y92 && playery2 < rect_y92 + rect_height92) ||
+							    (playerX2 + playerWidth2 > rect_x102 && playerX2 < rect_x102 + rect_width102 && playery2 + playerHeight2 > rect_y102 && playery2 < rect_y102 + rect_height102) ||
+							    (playerX2 > rect_x112 && playerX2 + playerWidth2< rect_x112 + rect_width112 && playery2 > rect_y112 && playery2 + playerHeight2< rect_y112 + rect_height112))
+							   
+							
+							    begin
+							        withinAnyRectangle <= 1; // Player is within at least one rectangle
+							    end
+								 else withinAnyRectangle <= 0;
+
+							if ((playerX3  > rect_x13 && playerX3 + playerWidth3< rect_x13 + rect_width13 && playery3  > rect_y13 && playery3 + playerHeight3 < rect_y13 + rect_height13) ||
+							    (playerX3 + playerWidth3 > rect_x23 && playerX3 < rect_x23 + rect_width23 && playery3 > rect_y23 && playery3 + playerHeight3< rect_y23 + rect_height23) ||
+							    (playerX3 + playerWidth3 > rect_x33 && playerX3 < rect_x33 + rect_width33 && playery3 > rect_y33 && playery3 + playerHeight3 < rect_y33 + rect_height33) ||
+							    (playerX3 + playerWidth3 > rect_x43 && playerX3 < rect_x43 + rect_width43 && playery3 > rect_y43 && playery3 + playerHeight3 < rect_y43 + rect_height43)) 
+						    begin
+						        withinAnyRectangle = 1; // Player is within at least one rectangle
+						    end
+							 else withinAnyRectangle <= 0;
+
+							case(level_selection) 
+
+							2'b00: withinAnyRectangle <= 0;
+
+							2'b01: begin
+
+								 if(!withinAnyRectangle)begin
+									playerX1 <= 113;
+									playery1 <= 443;
+									end
+							
+									  
+								  //move left
+								  if (switches[3] == 1 && withinAnyRectangle) begin
+										playerX1 <= playerX1 - 5;
+								  end
+								  //move up
+								  else if (switches[2] == 1 && withinAnyRectangle ) begin
+										playery1 <= playery1 - 5;
+								  end
+								  //move down
+								  else if (switches[1] == 1 && withinAnyRectangle ) begin
+										playery1 <= playery1 + 5;
+								  end
+								  //move right
+								  else if (switches[0] == 1 && withinAnyRectangle) begin
+										playerX1 <= playerX1 + 5;
+								  end
+							end
+
+								2'b10: begin
+									 if(!withinAnyRectangle)begin
+										playerX2 <= 33;
+										playery2 <= 443;
+										end
+								
+										  
+									  //move left
+									  if (switches[3] == 1 && withinAnyRectangle) begin
+											playerX2 <= playerX2 - 5;
+									  end
+									  //move up
+									  else if (switches[2] == 1 && withinAnyRectangle ) begin
+											playery2 <= playery2 - 5;
+									  end
+									  //move down
+									  else if (switches[1] == 1 && withinAnyRectangle ) begin
+											playery2 <= playery2 + 5;
+									  end
+									  //move right
+									  else if (switches[0] == 1 && withinAnyRectangle) begin
+											playerX2 <= playerX2 + 5;
+									  end
+								end
+
+								2'b11: begin 
+									 if(!withinAnyRectangle)begin
+										playerX3 <= 13;
+										playery3 <= 230;
+										end
+								
+									  //move left
+									  if (switches[3] == 1 && withinAnyRectangle) begin
+											playerX3 <= playerX - 5;
+									  end
+									  //move up
+									  else if (switches[2] == 1 && withinAnyRectangle ) begin
+											playery3 <= playery - 5;
+									  end
+									  //move down
+									  else if (switches[1] == 1 && withinAnyRectangle ) begin
+											playery3 <= playery + 5;
+									  end
+									  //move right
+									  else if (switches[0] == 1 && withinAnyRectangle) begin
+											playerX3 <= playerX + 5;
+									  end
+								end
+							endcase 
+							 
+							
+							
+										if (0) // FINISH POSITION
 											next_gameplay <= finish; 
 										else if (1) // COLLISION 
 											next_gameplay <= game_init;
-										else if (ACCELEROMETER) 
+										else if (0) 
 											next_gameplay <= move; 
-										else if (!ACCELEROMETER) 
-											next_gameplay <= still; 
 												
 								
 								 end
 								 
-						still : begin 
-									
-										if (1) // FINISH POSITION
-											next_gameplay <= finish; 
-										else if (1) // COLLISION 
-											next_gameplay <= game_init;
-										else if (ACCELEROMETER) 
-											next_gameplay <= move; 
-										else if (!ACCELEROMETER) 
-											next_gameplay <= still; 
-								  
-								  end
 								  
 						finish : begin
+								playerX3 <= 13;
+								playery3 <= 230;
+								playerX2 <= 33;
+								playery2 <= 443;
+								playerX1 <= 113;
+								playery1 <= 443;
+								withinAnyRectangle <= 0;
+								
 									
 									if (!KEY0)
 										next_gameplay <= game_init; 
