@@ -93,7 +93,7 @@ module DE10_LITE_Golden_Top(
 
 	//////////// VGA: 3.3-V LVTTL //////////
 `ifdef ENABLE_VGA
-	output reg		     [3:0]		VGA_B,
+	output	reg	     [3:0]		VGA_B,
 	output	reg	     [3:0]		VGA_G,
 	output		          		VGA_HS,
 	output		reg     [3:0]		VGA_R,
@@ -122,23 +122,59 @@ module DE10_LITE_Golden_Top(
 );
 
 
-
 //=======================================================
 //  REG/WIRE declarations
 //=======================================================
 wire [31:0] col,row;
 wire [3:0] red, green, blue;
 wire h_sync,v_sync, display_en, pixel_clk;
+wire [4:0] tilt;
 
 
+localparam SPI_CLK_FREQ  = 200;  // SPI Clock (Hz)
+   localparam UPDATE_FREQ   = 1;    // Sampling frequency (Hz)
 
+   // clks and reset
+   wire reset_n;
+   wire clk, spi_clk, spi_clk_out;
+
+   // output data
+   wire data_update;
+   wire [15:0] data_x, data_y;
+	
+	
 
 //=======================================================
 //  Structural coding
 //=======================================================
-pll pll_inst(.inclk0(MAX10_CLK1_50), .c0(pixel_clk));
+
+
+pll pll_inst(.inclk0(MAX10_CLK1_50), .c0(pixel_clk), .c1 ( spi_clk ),.c2 ( spi_clk_out ));
+//===== Instantiation of the spi_control module which provides the logic to 
+//      interface to the accelerometer.
+spi_control #(     // parameters
+      .SPI_CLK_FREQ   (SPI_CLK_FREQ),
+      .UPDATE_FREQ    (UPDATE_FREQ))
+   spi_ctrl (      // port connections
+      .reset_n    (reset_n),
+      .clk        (clk),
+      .spi_clk    (spi_clk),
+      .spi_clk_out(spi_clk_out),
+      .data_update(data_update),
+      .data_x     (data_x),
+      .data_y     (data_y),
+      .SPI_SDI    (GSENSOR_SDI),
+      .SPI_SDO    (GSENSOR_SDO),
+      .SPI_CSN    (GSENSOR_CS_N),
+      .SPI_CLK    (GSENSOR_SCLK),
+      .interrupt  (GSENSOR_INT)
+   );
 vga_controller(pixel_clk,KEY[0],VGA_HS,VGA_VS, display_en, col, row);
-controller(SW[1:0], SW[9], MAX10_CLK2_50, KEY[0], col, row, SW[5:2], red, green, blue);
+controller(SW[1:0], SW[9], MAX10_CLK2_50, KEY[0], col, row, data_x, data_y, SW[5], red, green, blue);
+// Pressing KEY0 freezes the accelerometer's output
+assign reset_n = KEY[0];
+
+assign LEDR = {SW[9:8], data_x[7:0]};
 always@(posedge pixel_clk)begin
 	if(display_en == 1'b1)begin
 		VGA_R <= red;
