@@ -6,8 +6,9 @@ input logic pixel_clk,
 input logic KEY0,
 input [9:0]  col,
 input [8:0]  row,
-input [3:0] switches, 
-
+input signed [15:0] data_x, 
+input signed [15:0] data_y,
+input logic Switch, //horizontal lock switch used to control horizontal/vertical movement
 
 
 output logic [3:0] red,
@@ -16,7 +17,6 @@ output logic [3:0] blue
 
 );
 
-logic ACCELEROMETER = 1;  // REPLACE THIS WITH THE ACTUAL ACCELEROMETER INPUT
 logic clk;
 logic [1:0] level;
 logic [1:0] next_level;
@@ -805,7 +805,7 @@ always_ff
 					withinAnyRectangle2 <= 1;
 					withinAnyRectangle3 <= 1;
 										
-											if (switches != 4'b0000) 
+											if (data_x != 0 || data_y != 0) 
 												next_gameplay <= move; 
 											else 
 												next_gameplay <= game_init;
@@ -897,77 +897,90 @@ always_ff
 
 							2'b01: begin
 
-								 if(!withinAnyRectangle1 || ~KEY0)begin
+								 if(!withinAnyRectangle1  || ~KEY0)begin
 									playerX1 <= 113;
 									playery1 <= 443;
 									end
 							
-									  
+								if(Switch == 0) begin 
 								  //move left
-								  if (switches[3] == 1 && withinAnyRectangle1) begin
+								  if (data_x[6] == 1 && withinAnyRectangle1) begin
 										playerX1 <= playerX1 - 5;
 								  end
+								  //move right
+								  else if ((data_x[7] == 1 && data_x[6] == 0) && withinAnyRectangle1) begin
+										playerX1 <= playerX1 + 5;
+								  end
+								end
+								else begin
 								  //move up
-								  else if (switches[2] == 1 && withinAnyRectangle1 ) begin
+								  if (data_y > 16'd100 && withinAnyRectangle1 && Switch == 1) begin
 										playery1 <= playery1 - 5;
 								  end
 								  //move down
-								  else if (switches[1] == 1 && withinAnyRectangle1 ) begin
+								  else if (data_y < -16'd100 && withinAnyRectangle1 && Switch == 1) begin
 										playery1 <= playery1 + 5;
 								  end
-								  //move right
-								  else if (switches[0] == 1 && withinAnyRectangle1) begin
-										playerX1 <= playerX1 + 5;
-								  end
+								end
+								  
 							end
 
 								2'b10: begin
-									 if(!withinAnyRectangle2 || ~KEY0)begin
+									 if(!withinAnyRectangle2  || ~KEY0)begin
 										playerX2 <= 33;
 										playery2 <= 443;
 										end
 								
 										  
-									  //move left
-									  if (switches[3] == 1 && withinAnyRectangle2) begin
-											playerX2 <= playerX2 - 5;
-									  end
-									  //move up
-									  else if (switches[2] == 1 && withinAnyRectangle2 ) begin
-											playery2 <= playery2 - 5;
-									  end
-									  //move down
-									  else if (switches[1] == 1 && withinAnyRectangle2 ) begin
-											playery2 <= playery2 + 5;
-									  end
-									  //move right
-									  else if (switches[0] == 1 && withinAnyRectangle2) begin
-											playerX2 <= playerX2 + 5;
-									  end
+									  if(Switch == 0) begin 
+								  //move left
+								  if (data_x[6] == 1 && withinAnyRectangle2) begin
+										playerX2 <= playerX2 - 5;
+								  end
+								  //move right
+								  else if ((data_x[7] == 1 && data_x[6] == 0) && withinAnyRectangle2) begin
+										playerX2 <= playerX2 + 5;
+								  end
+								end
+								else begin
+								  //move up
+								  if (data_y > 16'd100 && withinAnyRectangle2 && Switch == 1) begin
+										playery2 <= playery2 - 5;
+								  end
+								  //move down
+								  else if (data_y < -16'd100 && withinAnyRectangle2 && Switch == 1) begin
+										playery2 <= playery2 + 5;
+								  end
+								end
+									  
 								end
 
 								2'b11: begin 
-									 if(!withinAnyRectangle3 || ~KEY0)begin
+									 if(!withinAnyRectangle3  || ~KEY0)begin
 										playerX3 <= 13;
 										playery3 <= 230;
 										end
 								 
-									  //move left
-									  if (switches[3] == 1 && withinAnyRectangle3) begin
-											playerX3 <= playerX3 - 5;
-									  end
-									  //move up
-									  else if (switches[2] == 1 && withinAnyRectangle3 ) begin
-											playery3 <= playery3 - 5;
-									  end
-									  //move down
-									  else if (switches[1] == 1 && withinAnyRectangle3 ) begin
-											playery3 <= playery3 + 5;
-									  end
-									  //move right
-									  else if (switches[0] == 1 && withinAnyRectangle3) begin
-											playerX3 <= playerX3 + 5;
-									  end
+									  if(Switch == 0) begin 
+								  //move left
+								  if (data_x[6] == 1 && withinAnyRectangle3) begin
+										playerX3 <= playerX3 - 5;
+								  end
+								  //move right
+								  else if ((data_x[7] == 1 && data_x[6] == 0) && withinAnyRectangle3) begin
+										playerX3 <= playerX3 + 5;
+								  end
+								end
+								else begin
+								  //move up
+								  if (data_y > 16'd100 && withinAnyRectangle3 && Switch == 1) begin
+										playery3 <= playery3 - 5;
+								  end
+								  //move down
+								  else if (data_y < -16'd100 && withinAnyRectangle3 && Switch == 1) begin
+										playery3 <= playery3 + 5;
+								  end
+								end
 								end
 							endcase 
 						end
