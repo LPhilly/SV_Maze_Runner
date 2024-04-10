@@ -1,13 +1,13 @@
 module controller (
 	
-input logic [1:0] level_select, 
-input logic level_lock, 
+input logic [1:0] level_select, //SW[1:0] positions: 00 - none, 01 - level 1, 10 - level 2, 11 - level 3
+input logic level_lock, //SW9 locks into the currently chosen level
 input logic pixel_clk, 
-input logic KEY0,
+input logic KEY0, //RESET: resets the map and moveable character to initial position
 input [9:0]  col,
 input [8:0]  row,
-input signed [15:0] data_x, 
-input signed [15:0] data_y,
+input signed [15:0] data_x, //horizontal movement from accelerometer
+input signed [15:0] data_y, //vertical movement form accelerometer
 input logic Switch, //horizontal lock switch used to control horizontal/vertical movement
 
 
