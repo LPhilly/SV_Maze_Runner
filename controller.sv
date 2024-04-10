@@ -216,15 +216,18 @@ logic [9:0] playery3 = 230;
 logic [9:0] playerWidth3 = 25;
 logic [9:0] playerHeight3 = 25;
 
+// State register
 always_ff @ (posedge clk) begin 
 	current_state <= next_state;
 	current_gameplay <= next_gameplay;
 	level <= next_level;
 end 
 
+// Combinational logic
 always_ff
 	case (current_state)
 		init: begin
+					// Set drivers to default values
 					next_level <= level;
 					red <= 4'h0;
 					green <= 4'h0;
@@ -244,13 +247,13 @@ always_ff
 								withinAnyRectangle2 <= 1;
 								withinAnyRectangle3 <= 1;
 									case (level_select) 
-										2'b00: 	begin
+										2'b00: 	begin // Do nothing
 													red <= 0;
 													blue <= 0;
 													green <= 0;
 													next_level <= 2'b00;
 												end
-										2'b01: begin
+										2'b01: begin // Draw level 1
 													if (col >= playerX1 && col < playerX1 + playerWidth1 && row >= playery1 && row < playery1 + playerHeight1)
 														begin 
 															red <= 4'hF; 
@@ -332,7 +335,7 @@ always_ff
 													next_level <= 2'b01;
 		
 												 end
-										2'b10: begin
+										2'b10: begin // draw level 2
 												if (col >= playerX2 && col < playerX2 + playerWidth2 && row >= playery2 && row < playery2 + playerHeight2)
 													begin 
 														red <= 4'hF; 
@@ -453,7 +456,7 @@ always_ff
 													end
 												next_level <= 2'b10;
 												 end
-										2'b11: begin 
+										2'b11: begin  // draw level 3
 												if (col >= playerX3 && col < playerX3 + playerWidth3 && row >= playery3 && row < playery3 + playerHeight3)
 													begin 
 														red <= 4'hF; 
@@ -529,6 +532,7 @@ always_ff
 							  end
 		gameplay: begin
 					next_level <= level;
+			// NOTE: As to keep the level rendered throughout gameplay, we still need to render the levels in gameplay. 
 		
 					case (level) 
 										2'b00: 	begin
@@ -811,7 +815,7 @@ always_ff
 												next_gameplay <= game_init;
 										end
 						move : begin
-
+							// Set collision conditions by level 
 							if ((playerX1  > rect_x11 && playerX1 + playerWidth1< rect_x11 + rect_width11 && playery1  > rect_y11 && playery1 + playerHeight1 < rect_y11 + rect_height11) ||
 							    (playerX1 + playerWidth1 > rect_x21 && playerX1 < rect_x21 + rect_width21 && playery1 > rect_y21 && playery1 + playerHeight1< rect_y21 + rect_height21) ||
 							    (playerX1 + playerWidth1 > rect_x31 && playerX1 < rect_x31 + rect_width31 && playery1 + playerHeight1 > rect_y31 && playery1 < rect_y31 + rect_height31) ||
@@ -892,6 +896,7 @@ always_ff
 	endcase
 	
 	always @ (posedge clk) begin
+		// Govern player movment and starting position
 		if (current_state == gameplay && current_gameplay == move) begin
 				case(level) 
 
